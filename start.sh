@@ -8,5 +8,4 @@ done
 
 echo "PostgreSQL started"
 
-rq worker -u redis://redis:6379 &
 exec uvicorn app:app --host 0.0.0.0 --port 8000
