@@ -3,6 +3,7 @@ from fastapi import Body, FastAPI
 from redis import Redis
 from rq import Queue
 
+from db import get_db_connection
 from long_job import count_words_at_url
 
 app = FastAPI()
@@ -12,13 +13,7 @@ q = Queue(connection=Redis(host="redis", port=6379))
 @app.on_event("startup")
 def startup_event():
     print("Creating database if it doesn't exist")
-    conn = psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        host="db",
-        port="5432",
-    )
+    conn = get_db_connection()
     c = conn.cursor()
     c.execute(
         """
@@ -39,13 +34,7 @@ def read_root():
 
 
 def insert_job(job_id, url):
-    conn = psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        host="db",
-        port="5432",
-    )
+    conn = get_db_connection()
     c = conn.cursor()
 
     # Insert a row of data
@@ -62,18 +51,12 @@ def insert_job(job_id, url):
 def start_task(url: str = Body(...)):
     job = q.enqueue(count_words_at_url, args=(url,))
     insert_job(job.id, url)
-    return f"Task ({job.id}) added to queue at {job.enqueued_at}"
+    return {"job_id": job.id}
 
 
 @app.get("/get_result/{job_id}")
 def get_result(job_id: str):
-    conn = psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        host="db",
-        port="5432",
-    )
+    conn = get_db_connection()
     c = conn.cursor()
     c.execute("SELECT result FROM jobs WHERE job_id = %s", (job_id,))
     result = c.fetchone()
