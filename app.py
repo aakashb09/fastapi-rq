@@ -2,7 +2,7 @@ from fastapi import Body, FastAPI
 from redis import Redis
 from rq import Queue
 
-from db import DatabaseConnectionManager, get_db_connection
+from db import DatabaseConnectionManager
 from long_job import count_words_at_url
 
 app = FastAPI()

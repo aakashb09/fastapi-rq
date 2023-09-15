@@ -15,12 +15,12 @@ services:
   db:
     image: postgres:15
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
   worker:
     build: .
-    command: rq worker -u redis://redis:6379
+    command: rq worker -u redis://${REDIS_AUTH}:6379
     depends_on:
       - redis
