@@ -1,0 +1,6 @@
+rq==1.15.1
+fastapi==0.94.1
+uvicorn==0.21.1
+redis==5.0.0
+requests==2.31.0
+psycopg2-binary==2.9.7
