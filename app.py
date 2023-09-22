@@ -1,6 +1,6 @@
 from fastapi import Body, FastAPI
 from redis import Redis
-from rq import Queue
+from rq import Queue, Retry
 
 from db import DatabaseConnectionManager
 from long_job import count_words_at_url
@@ -44,7 +44,7 @@ def insert_job(job_id, url):
 
 @app.post("/start_task")
 def start_task(url: str = Body(...)):
-    job = q.enqueue(count_words_at_url, args=(url,))
+    job = q.enqueue(count_words_at_url, args=(url,), retry=Retry(max=6, interval=10))
     insert_job(job.id, url)
     return {"job_id": job.id}
 

@@ -21,6 +21,14 @@ services:
       - "5432:5432"
   worker:
     build: .
-    command: rq worker -u redis://${REDIS_AUTH}:6379
+    command: rq worker -u redis://${REDIS_AUTH}:6379 --with-scheduler
+    depends_on:
+      - redis
+  rq-dashboard:
+    image: eoranged/rq-dashboard
+    ports:
+      - "9181:9181"
+    environment:
+      - RQ_DASHBOARD_REDIS_URL=redis://redis:6379
     depends_on:
       - redis
